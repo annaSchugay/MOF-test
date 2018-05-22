@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  import mock from '@/api/transactions'
+  import axios from 'axios'
   import zingchart from 'zingchart'
 
   export default {
@@ -26,15 +26,13 @@
     watch: {
       currentRegion: function(val) {
         this.values = []
-        this.getMockData(val)
-        // this.getApiData(val)
+        this.getApiData(val)
       }
     },
     methods: {
       renderChart: function() {
         let self = this
         setTimeout(() => {
-          console.log(self.values)
           zingchart.render({
             id: 'chart',
             data: {
@@ -47,23 +45,18 @@
           });
         }, 0)
       },
-      getMockData (id) {
-        let self = this
-        mock.getTransactionsByRegion(result => {
-          self.transactions = result
-          for(let i = 0; i < result.length; i++) {
-            self.values[i] = +result[i].amount
-          }
-          this.renderChart()
-       }, id)
-      },
       getApiData (id) {
         let self = this
-        this.$http.get(`http://api.spending.gov.ua/api/v2/api/transactions/top100?region=${id}`)
+        axios.get('https://thingproxy.freeboard.io/fetch/http://api.spending.gov.ua/api/v2/api/transactions/top100?region=' + id,
+          {
+            params: {
+              mode: 'no-cors'
+            }
+          })
           .then(result => {
-            self.transactions = result
-            for(let i = 0; i < result.length; i++) {
-              self.values[i] = +result[i].amount
+            self.transactions = result.data
+            for(let i = 0; i < result.data.length; i++) {
+              self.values[i] = +result.data[i].amount
             }
             this.renderChart()
           })

@@ -8,7 +8,7 @@
 </template>
 
 <script>
-  import mock from '@/api/regions'
+  import axios from "axios"
   export default {
     data () {
       return {
@@ -21,14 +21,18 @@
         this.$emit('updateRegion', el.target.value)
       },
       getRegionsFromApi: function() {
-        this.$http.get('http://api.spending.gov.ua/api/v2/regions')
+        axios.get('https://thingproxy.freeboard.io/fetch/http://api.spending.gov.ua/api/v2/regions',
+          {
+            params: {
+              mode: 'no-cors'
+            }
+          })
           .then(result => {this.regions = result.data})
           .catch(error => console.error(error))
       }
     },
     created () {
-      mock.getAll(result => this.regions = result)
-      //this.getRegionsFromApi()
+      this.getRegionsFromApi()
     },
     name:'selectRegion'
   }
